@@ -1,0 +1,19 @@
+{
+  "dashboard": {
+    "title": "DevSecOps Dashboard",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Total Requests",
+        "targets": [
+          {
+            "expr": "request_count",
+            "format": "time_series"
+          }
+        ]
+      }
+    ],
+    "schemaVersion": 30,
+    "version": 1
+  }
+}

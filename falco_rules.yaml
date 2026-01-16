@@ -1,0 +1,5 @@
+- rule: Terminal shell in container
+  desc: Detect shell inside container
+  condition: container.id != host and evt.type = execve
+  output: "🚨 Terminal shell in container detected (user=%user.name container=%container.name)"
+  priority: WARNING
