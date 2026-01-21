@@ -1,17 +1,25 @@
-from fastapi import FastAPI
-from prometheus_client import Counter, generate_latest
+from fastapi import FastAPI, Request
+from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 from starlette.responses import Response
-import psutil
 
 app = FastAPI()
-REQUEST_COUNT = Counter("request_count", "Total request count")
+
+REQUEST_COUNT = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "endpoint"]
+)
+
+@app.middleware("http")
+async def count_requests(request: Request, call_next):
+    response = await call_next(request)
+    REQUEST_COUNT.labels(request.method, request.url.path).inc()
+    return response
 
 @app.get("/")
-def home():
-    REQUEST_COUNT.inc()
-    return {"message": "Hello from DevSecOps Dashboard 🚀"}
+def read_root():
+    return {"message": "DevSecOps Dashboard Running"}
 
 @app.get("/metrics")
 def metrics():
-    cpu_usage = psutil.cpu_percent()
-    return Response(generate_latest(), media_type="text/plain")
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
